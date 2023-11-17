@@ -74,8 +74,10 @@ This project implements a user management system with specific entities and asso
 
 ## Installation
 
-[Include instructions on how to install your application here.]
-
+```bash
+# install depenancies
+$ npm install
+```
 ## Running the app
 
 ```bash
@@ -91,20 +93,9 @@ $ npm run start:prod
 
 ## Configuration
 
-[Specify any configuration settings here.]
+add the missing values for .env file 
 
-## Contributing
-
-[Include guidelines for contributing to your project.]
-
-## Credits
-
-[Give credit to any resources or individuals who helped with the project.]
-
-## License
-
-[Specify the license under which your project is released.]
 
 ## Contact
 
-[Provide contact information for inquiries.]
+[mohamedlotfe](https://github.com/mohamedlotfe)
