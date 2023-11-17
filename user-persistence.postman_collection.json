@@ -1,0 +1,84 @@
+{
+	"info": {
+		"_postman_id": "8033dba9-c496-4fc0-bc13-de2a1a5dae69",
+		"name": "user-persistence",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+		"_exporter_id": "26873924",
+		"_collection_link": "https://zeyada.postman.co/workspace/Team-Workspace~cae5545c-cfe5-4564-86c2-8fb811456d67/collection/26873924-8033dba9-c496-4fc0-bc13-de2a1a5dae69?action=share&source=collection_link&creator=26873924"
+	},
+	"item": [
+		{
+			"name": "Register New Client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "FirstName",
+							"value": "John"
+						},
+						{
+							"key": "LastName",
+							"value": "Doe"
+						},
+						{
+							"key": "Email",
+							"value": "john.doe@example.com"
+						},
+						{
+							"key": "Password",
+							"value": "your_password"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://localhost:3000/api/register",
+					"protocol": "http",
+					"host": [
+						"localhost"
+					],
+					"port": "3000",
+					"path": [
+						"api",
+						"register"
+					]
+				}
+			},
+			"response": []
+		},
+		{
+			"name": "Login Client",
+			"request": {
+				"method": "POST",
+				"header": [],
+				"body": {
+					"mode": "formdata",
+					"formdata": [
+						{
+							"key": "Email",
+							"value": "john.doe@example.com"
+						},
+						{
+							"key": "Password",
+							"value": "your_password"
+						}
+					]
+				},
+				"url": {
+					"raw": "http://your-api-base-url/api/login",
+					"protocol": "http",
+					"host": [
+						"your-api-base-url"
+					],
+					"path": [
+						"api",
+						"login"
+					]
+				}
+			},
+			"response": []
+		}
+	]
+}
