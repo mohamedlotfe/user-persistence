@@ -10,17 +10,18 @@ import {
 import { BaseEntity } from './Base.entity';
 import { User } from './User.entity';
 import { Client } from './Client.entity';
-import { IsUrl } from 'class-validator';
+import { IsOptional, IsUrl } from 'class-validator';
 
 @Entity('photos', { schema: 'public' })
 export class Photo extends BaseEntity {
   @Column()
   name: string;
 
-  @Column()
+  @Column({nullable: true})
+  @IsOptional()
   @IsUrl()
-  url: string;
+  url?: string;
 
   @ManyToOne(() => Client, (client) => client.photos)
-  client: Client;
+  client?: Client;
 }

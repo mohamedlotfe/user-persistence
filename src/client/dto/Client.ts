@@ -1,13 +1,27 @@
-import { IsNotEmpty, IsArray, ArrayMinSize } from 'class-validator';
+import { IsNotEmpty, IsArray, ArrayMinSize, IsEmail } from 'class-validator';
+import { Photo } from 'src/entities/Photo.entity';
 
 export class ClientDto {
+  id: number;
+  firstName: string;
+  lastName: string;
+  email: string;
+  fullName: string;
+  photos: Photo[];
+}
+
+export class ClientRegisterDto {
   @IsNotEmpty()
   firstName: string;
 
   @IsNotEmpty()
   lastName: string;
 
-  @IsArray()
-  @ArrayMinSize(4)
-  photos: string[];
+  @IsNotEmpty()
+  @IsEmail()
+  email: string;
+
+  @IsNotEmpty()
+  @IsEmail()
+  password: string;
 }

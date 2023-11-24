@@ -21,9 +21,6 @@ export class Client extends User {
   
   @Column()
   fullName: string;
-  
-  //   @Column('text', { array: true, nullable: true })
-  //   photos: string[];
 
   @OneToMany(() => Photo, (photo) => photo.client, { cascade: true })
   photos: Photo[];

@@ -1,20 +1,37 @@
-import { ArgumentsHost, Catch, ExceptionFilter, HttpException, HttpStatus } from "@nestjs/common";
-import express, { Response} from 'express';
+import {
+  ArgumentsHost,
+  Catch,
+  ExceptionFilter,
+  HttpStatus,
+} from '@nestjs/common';
+import { Response } from 'express';
+import { EntityNotFoundError, QueryFailedError, TypeORMError } from 'typeorm';
+interface ErrorMessage {
+  status: number;
+  message: string;
+  type: string;
+  errors: { code: number; message: string }[];
+  errorCode: number;
+  timestamp: string;
+}
+@Catch(QueryFailedError, EntityNotFoundError)
+export class TypeORMQueryExceptionFilter extends TypeORMError {
+  catch(
+    exception: QueryFailedError | EntityNotFoundError,
+    host: ArgumentsHost,
+  ) {
+    const response = host.switchToHttp().getResponse();
+        let message: string = (exception as TypeORMError).message;
+        let code: number = (exception as any).code;
+        const customResponse: ErrorMessage = {
+            status: 500,
+            message: 'Something Went Wrong',
+            type: 'Internal Server Error',
+            errors: [{ code: code, message: message }],
+            errorCode: 300,
+            timestamp: new Date().toISOString(),
+        };
 
-@Catch()
-export class GlobalExceptionFilter implements ExceptionFilter {
-  catch(exception: any, host: ArgumentsHost) {
-    const ctx = host.switchToHttp();
-    const response = ctx.getResponse<Response>();
-
-    let status = HttpStatus.INTERNAL_SERVER_ERROR;
-    let message = 'Internal server error';
-
-    if (exception instanceof HttpException) {
-      status = exception.getStatus();
-      message = exception.getResponse() as string;
-    }
-
-    response.status(status).json({ message });
+        response.status(customResponse.status).json(customResponse);
   }
 }

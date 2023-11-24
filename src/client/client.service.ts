@@ -1,52 +1,69 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, NotFoundException } from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from 'src/entities/Client.entity';
 import { Photo } from 'src/entities/Photo.entity';
 import { Repository } from 'typeorm';
-import { ClientDto } from './dto/Client';
-import { S3Uploader } from 'src/utils/s3-uploading';
-import { generateFileName } from 'src/utils/helpers';
+import { ClientDto, ClientRegisterDto } from './dto/Client';
+import { IFile } from '../uploader/File.interface';
+import { UploaderService } from 'src/uploader/uploader.service';
+import { ClientMapper } from './dto/ClientMapper';
 
 @Injectable()
 export class ClientService {
   constructor(
     @InjectRepository(Client)
     private readonly clientRepository: Repository<Client>,
+    private readonly uploaderService: UploaderService,
   ) {}
 
-  async registerClient(clientDto: ClientDto): Promise<void> {
-    const { firstName, lastName, photos } = clientDto;
+  async register(
+    clientDto: ClientRegisterDto,
+    photos: IFile[],
+  ): Promise<ClientDto> {
+    try {
+      const { firstName, lastName, email, password } = clientDto;
 
-    const client = new Client();
-    client.firstName = firstName;
-    client.lastName = lastName;
-    client.fullName = `${firstName} ${lastName}`;
-    // The default avatar image
-    client.avatar = 'https://example.com/default-avatar.jpg';
+      const client = new Client();
+      client.firstName = firstName;
+      client.lastName = lastName;
+      client.email = email;
+      client.password = password;
+      client.fullName = `${firstName} ${lastName}`;
 
-    const uploader = new S3Uploader();
-    const photoEntities = await Promise.all(
-      photos.map(async (photo) => {
-        const fileBuffer = await uploader.convertToBuffer(photo);
-        const fileName = generateFileName();
+      // The default avatar image
+      client.avatar = 'https://example.com/default-avatar.jpg';
 
-        const photoUrl = await uploader.uploadPhoto(fileBuffer, fileName);
+      const photoEntities = await Promise.all(
+        photos.map(async (photo: IFile) => {
+          const photoUrl = await this.uploaderService.upload(photo);
 
-        const photoEntity = new Photo();
-        photoEntity.url = photoUrl;
-        photoEntity.client = client;
-        return photoEntity;
-      }),
-    );
+          const photoEntity = new Photo();
+          photoEntity.url = photoUrl;
+          photoEntity.client = client;
+          photoEntity.name = photo.originalname?.trim() ?? 'default.png';
+          return photoEntity;
+        }),
+      );
 
-    client.photos = photoEntities;
+      client.photos = photoEntities || [];
 
-    await this.clientRepository.save(client);
+      await this.clientRepository.save(client);
+
+      return ClientMapper.toDto(client);
+    } catch (error) {
+      console.log(error);
+      return Promise.reject(error);
+    }
   }
-  async getClientByEmailAndPassword(
-    email: string,
-    password: string,
-  ): Promise<Client | undefined> {
+  async getByEmail(email: string, password: string): Promise<Client> {
     return this.clientRepository.findOne({ email, password });
+  }
+
+  async getById(id: number): Promise<ClientDto> {
+    const client = await this.clientRepository.findOne({ where: { id } });
+    if (!client) {
+      throw new NotFoundException(`Client with ID ${id} not found`);
+    }
+    return ClientMapper.toDto(client);
   }
 }

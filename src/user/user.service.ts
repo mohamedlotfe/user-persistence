@@ -21,6 +21,7 @@ export class UserService {
       }
     return UserMapper.toDto(user);
   }
+
   async validateUser(email: string, pass: string): Promise<any> {
     const user = await this.userRepository.findOne( {where: { email }});
     if (user && user.password === pass) {
@@ -29,6 +30,7 @@ export class UserService {
     }
     return null;
   }
+  
   async createUser(createUserDto: CreateUserDto): Promise<UserDto> {
     const { firstName, lastName, email, password } = createUserDto;
 

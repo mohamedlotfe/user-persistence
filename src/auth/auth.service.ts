@@ -8,9 +8,9 @@ import { ClientService } from 'src/client/client.service';
 export class AuthService {
   constructor(
     private readonly jwtService: JwtService,
-    private readonly clientService:ClientService
+    private readonly clientService: ClientService,
   ) {}
-  
+
   generateToken(user: User): string {
     const payload = { sub: user.id };
     return this.jwtService.sign(payload);
@@ -19,7 +19,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<string> {
     const { email, password } = loginDto;
 
-    const client = await this.clientService.getClientByEmailAndPassword(
+    const client = await this.clientService.getByEmail(
       email,
       password,
     );
@@ -28,11 +28,10 @@ export class AuthService {
       throw new UnauthorizedException('Invalid email or password');
     }
 
-    const payload = { clientId: client.id };
-    const token = this.jwtService.sign(payload);
+    const payload = { clientId: client.id, email };
+    const secretKey = process.env.JWT_SECRET ?? 'your-secret-key';
 
+    const token = this.jwtService.sign(payload, { secret: secretKey });
     return token;
   }
-  
- 
 }

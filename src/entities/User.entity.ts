@@ -24,14 +24,13 @@ export class User extends BaseEntity {
   @IsEmail()
   email: string;
 
-  @Column({ length: 50 })
+  @Column({ nullable: true })
+  @IsOptional()
   @Length(6, 50)
-  password: string;
+  password?: string;
 
   @Column({ default: true })
   @IsBoolean()
   @IsOptional()
   active: boolean;
-
-
 }

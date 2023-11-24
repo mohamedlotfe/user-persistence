@@ -1,15 +1,15 @@
 import { Controller, Get, Req, UseGuards } from '@nestjs/common';
-import { UserService } from './user.service';
-import { UserDto } from './dtos/UserDto';
-import { JwtAuthGuard } from 'src/auth/guard/jwt-auth.guard';
+import { JwtAuthGuard } from './../auth/guard/jwt-auth.guard';
+import { ClientService } from 'src/client/client.service';
+import { ClientDto } from 'src/client/dto/Client';
 
 @Controller('users')
 export class UserController {
-  constructor(private readonly userService: UserService) {}
+  constructor(private readonly clientService: ClientService) {}
 
   @Get('me')
   @UseGuards(JwtAuthGuard)
-  getMe(@Req() request): Promise<UserDto> {
-    return this.userService.getById(request.user.id);
+  getMe(@Req() request): Promise<ClientDto> {
+    return this.clientService.getById(request.user.id);
   }
 }
