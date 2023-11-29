@@ -4,6 +4,9 @@ import {
   Body,
   UseInterceptors,
   UploadedFiles,
+  ParseFilePipe,
+  MaxFileSizeValidator,
+  FileTypeValidator,
 } from '@nestjs/common';
 import { ClientService } from './client.service';
 import { ClientDto, ClientRegisterDto } from './dto/Client';
@@ -11,6 +14,9 @@ import { FilesInterceptor } from '@nestjs/platform-express';
 import { IFile } from '../uploader/File.interface';
 import { AuthService } from 'src/auth/auth.service';
 import { LoginDto } from 'src/auth/dtos/LoginDto';
+import { ApiFiles } from 'src/uploader/api-files.decorator';
+import { parse } from 'path';
+import { ParseFile } from 'src/uploader/parse-file.pipe';
 
 @Controller('api')
 export class ClientController {
@@ -20,9 +26,9 @@ export class ClientController {
   ) {}
 
   @Post('register')
-  @UseInterceptors(FilesInterceptor('photos', 4))
+  @ApiFiles('photos')
   async registerClient(
-    @UploadedFiles() photos: Array<IFile>,
+    @UploadedFiles(new ParseFile(4)) photos: Array<IFile>,
     @Body() input: ClientRegisterDto,
   ): Promise<ClientDto> {
     return await this.clientService.register(input, photos);
@@ -34,3 +40,12 @@ export class ClientController {
     return { token };
   }
 }
+
+// @UploadedFiles(
+//   new ParseFilePipe({
+//     validators: [
+//       new MaxFileSizeValidator({ maxSize: 1000 }),
+//       new FileTypeValidator({ fileType: 'image/png' }),
+//     ],
+//   }),
+// )

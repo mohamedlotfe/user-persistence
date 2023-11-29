@@ -1,4 +1,4 @@
-import { IsNotEmpty, IsArray, ArrayMinSize, IsEmail } from 'class-validator';
+import { IsNotEmpty, IsArray, ArrayMinSize, IsEmail, IsStrongPassword } from 'class-validator';
 import { Photo } from 'src/entities/Photo.entity';
 
 export class ClientDto {
@@ -22,6 +22,6 @@ export class ClientRegisterDto {
   email: string;
 
   @IsNotEmpty()
-  @IsEmail()
+  @IsStrongPassword()
   password: string;
 }

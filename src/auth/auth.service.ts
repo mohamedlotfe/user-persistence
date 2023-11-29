@@ -19,7 +19,7 @@ export class AuthService {
   async login(loginDto: LoginDto): Promise<string> {
     const { email, password } = loginDto;
 
-    const client = await this.clientService.getByEmail(
+    const client = await this.clientService.getByEmailAndPass(
       email,
       password,
     );

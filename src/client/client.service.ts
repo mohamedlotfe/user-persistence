@@ -1,4 +1,8 @@
-import { Injectable, NotFoundException } from '@nestjs/common';
+import {
+  BadRequestException,
+  Injectable,
+  NotFoundException,
+} from '@nestjs/common';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Client } from 'src/entities/Client.entity';
 import { Photo } from 'src/entities/Photo.entity';
@@ -23,6 +27,10 @@ export class ClientService {
     try {
       const { firstName, lastName, email, password } = clientDto;
 
+      if (await this.getByEmail(email)) {
+        throw new BadRequestException('Email already  in use for other client');
+      }
+      
       const client = new Client();
       client.firstName = firstName;
       client.lastName = lastName;
@@ -55,7 +63,7 @@ export class ClientService {
       return Promise.reject(error);
     }
   }
-  async getByEmail(email: string, password: string): Promise<Client> {
+  async getByEmailAndPass(email: string, password: string): Promise<Client> {
     return this.clientRepository.findOne({ email, password });
   }
 
@@ -65,5 +73,9 @@ export class ClientService {
       throw new NotFoundException(`Client with ID ${id} not found`);
     }
     return ClientMapper.toDto(client);
+  }
+
+  async getByEmail(email: string): Promise<Client> {
+    return this.clientRepository.findOne({ email });
   }
 }
